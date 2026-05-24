@@ -1,0 +1,94 @@
+{
+  "landing": {
+    "title": "Our Story",
+    "subtitle": "Two people remember the same relationship differently.",
+    "start": "Begin Journey",
+    "language": "Language"
+  },
+  "setup": {
+    "title": "Who is playing?",
+    "p1_placeholder": "Player 1 Name",
+    "p2_placeholder": "Player 2 Name",
+    "relationship_stage": "Where are you now?",
+    "question_tone": "What tone should the questions have?",
+    "stages": {
+      "new_love": "What she thinks about me",
+      "in_love": "Perfect relationship",
+      "long_distance": "Long distance",
+      "after_fight": "After fight",
+      "almost_broken": "Almost broken"
+    },
+    "tones": {
+      "tender": "Tender",
+      "honest": "Honest",
+      "funny": "Funny",
+      "deep": "Deep"
+    },
+    "continue": "Continue"
+  },
+  "memory": {
+    "title": "Memory Seed",
+    "p1_turn": "{name}'s Turn",
+    "p2_turn": "{name}'s Turn",
+    "q1": "Most memorable moment together?",
+    "q2": "One thing you never said?",
+    "q3": "What do you feel but don't express?",
+    "next": "Next",
+    "finish": "Finish Memories",
+    "pass_device": "Pass the device to {name} and click next."
+  },
+  "game": {
+    "round": "Round {num}",
+    "compare": "Compare Memories",
+    "similarity": "Similarity",
+    "next_round": "Next Round",
+    "finish": "View Journey"
+  },
+  "factory": {
+    "title": "Love Factory",
+    "subtitle": "14 shared flavors to complete together",
+    "levels": {
+      "1": "First Taste: Ramen",
+      "2": "Getting Used Sandwich",
+      "3": "Late Night Pasta",
+      "4": "Comfort Pizza",
+      "5": "Quiet Moment: Mashed Potatoes",
+      "6": "Kitchen Teamwork: Chicken Noodles in Soy Sauce",
+      "7": "Memory Curry",
+      "8": "Jealous Burger",
+      "9": "Healing Salad",
+      "10": "Trust Sushi",
+      "11": "Forgiveness Chicken Soup",
+      "12": "Almost There Syrniki",
+      "13": "Deep Chocolate Moment",
+      "14": "Final Taste: Wedding Cake"
+    },
+    "completed": "Completed"
+  },
+  "list": {
+    "title": "Love List",
+    "subtitle": "If we forget everything else — let's not forget this list.",
+    "items": {
+      "1": "Keep the TikTok streak flame going until 100",
+      "2": "Remember what matters deeply to your other half",
+      "3": "Wash the dishes for her",
+      "4": "Cook him something to eat",
+      "5": "Get offended because of something you saw in a dream",
+      "6": "Fix something difficult together",
+      "7": "Defend him from other people's words",
+      "8": "Meet spontaneously at night",
+      "9": "Start loving something you disliked because of her",
+      "10": "Feed bad-tasting food to friends",
+      "11": "Take care of them when they get sick",
+      "12": "Start using his or her phrases",
+      "13": "Have local inside memes",
+      "14": "Do 50k steps in one go together"
+    }
+  },
+  "summary": {
+    "title": "Your Relationship Story",
+    "score": "Resonance Score",
+    "timeline": "Emotional Timeline",
+    "replay": "Start Over"
+  }
+}
