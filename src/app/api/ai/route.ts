@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import crypto from "node:crypto";
 import { getCurrentUser } from "@/lib/auth";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
@@ -18,11 +19,17 @@ const fallbackQuestions: Record<string, { en: string[]; ru: string[] }> = {
       "What do you hope she notices in you when you are not trying?",
       "What are you afraid she might misunderstand about you?",
       "If she could read one quiet thought of yours, what would it be?",
+      "What part of you becomes softer when you imagine her choosing you?",
+      "What question about you do you secretly hope she asks first?",
+      "What small sign would make you feel that she is thinking about you?",
     ],
     ru: [
       "Что ты надеешься, что она замечает в тебе, когда ты не стараешься?",
       "Что ты боишься, что она может неправильно понять в тебе?",
       "Если бы она могла прочитать одну твою тихую мысль, что бы это было?",
+      "Какая часть тебя становится мягче, когда ты представляешь, что она выбирает тебя?",
+      "Какой вопрос о себе ты тайно хочешь от неё услышать первым?",
+      "Какой маленький знак дал бы тебе понять, что она думает о тебе?",
     ],
   },
   in_love: {
@@ -30,11 +37,17 @@ const fallbackQuestions: Record<string, { en: string[]; ru: string[] }> = {
       "What does an ideal relationship look like in the smallest daily details?",
       "What should never disappear between you, even years later?",
       "When do you feel your relationship is closest to perfect?",
+      "What ordinary moment between you feels more romantic than a big gesture?",
+      "What rule would you invent to protect the warmth between you?",
+      "What do you want your partner to feel every time they come home to you?",
     ],
     ru: [
       "Как выглядят идеальные отношения в самых маленьких бытовых деталях?",
       "Что между вами не должно исчезнуть даже через годы?",
       "В какой момент ты чувствуешь, что ваши отношения ближе всего к идеальным?",
+      "Какой обычный момент между вами романтичнее любого большого жеста?",
+      "Какое правило ты бы придумал(а), чтобы беречь тепло между вами?",
+      "Что ты хочешь, чтобы партнёр чувствовал каждый раз, возвращаясь к тебе?",
     ],
   },
   long_distance: {
@@ -42,11 +55,17 @@ const fallbackQuestions: Record<string, { en: string[]; ru: string[] }> = {
       "What do you miss most that can't be sent over a screen?",
       "What's the first thing you want to do when you're finally together?",
       "Describe a time the distance felt heaviest.",
+      "What tiny ritual would make the distance feel less empty this week?",
+      "What do you want them to know on the nights when you answer late?",
+      "What promise feels realistic enough to keep from far away?",
     ],
     ru: [
       "Чего больше всего не хватает, что нельзя передать через экран?",
       "Что ты хочешь сделать в первую очередь, когда вы снова будете вместе?",
       "Опиши момент, когда расстояние ощущалось особенно тяжело.",
+      "Какой маленький ритуал сделал бы расстояние менее пустым на этой неделе?",
+      "Что ты хочешь, чтобы он(а) знал(а) в вечера, когда ты отвечаешь поздно?",
+      "Какое обещание кажется достаточно реальным, чтобы держать его на расстоянии?",
     ],
   },
   after_fight: {
@@ -54,11 +73,17 @@ const fallbackQuestions: Record<string, { en: string[]; ru: string[] }> = {
       "What were you actually trying to say during the argument?",
       "What do you wish had been said differently?",
       "What's one thing you love about them that you forgot during the fight?",
+      "What feeling was hiding underneath your sharpest words?",
+      "What would a repair look like if nobody had to win?",
+      "What soft thing do you still want to say, even after being hurt?",
     ],
     ru: [
       "Что ты на самом деле пытался(ась) сказать во время ссоры?",
       "Что ты хотел(а) бы сказать по-другому?",
       "Что ты любишь в нём/ней, о чём забыл(а) во время ссоры?",
+      "Какое чувство пряталось под твоими самыми резкими словами?",
+      "Как выглядело бы примирение, если никому не нужно победить?",
+      "Что мягкое ты всё ещё хочешь сказать, даже после обиды?",
     ],
   },
   almost_broken: {
@@ -66,14 +91,28 @@ const fallbackQuestions: Record<string, { en: string[]; ru: string[] }> = {
       "What is the one memory that still makes you want to stay?",
       "What did you stop saying that you used to say all the time?",
       "If you could rewind to one moment, which would it be?",
+      "What are you afraid would disappear if you really let go?",
+      "What still feels unfinished between you?",
+      "What would have to change for hope to feel honest again?",
     ],
     ru: [
       "Какое воспоминание всё ещё заставляет тебя остаться?",
       "Что ты перестал(а) говорить, хотя раньше говорил(а) постоянно?",
       "Если бы ты мог(ла) вернуться к одному моменту — к какому?",
+      "Что, как тебе страшно, исчезнет, если ты правда отпустишь?",
+      "Что между вами всё ещё ощущается незавершённым?",
+      "Что должно измениться, чтобы надежда снова была честной?",
     ],
   },
 };
+
+function randomThree(items: string[]) {
+  return items
+    .map((item) => ({ item, order: crypto.randomInt(0, 1_000_000) }))
+    .sort((a, b) => a.order - b.order)
+    .slice(0, 3)
+    .map(({ item }) => item);
+}
 
 async function callDeepSeek(messages: { role: string; content: string }[]) {
   const res = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
@@ -85,7 +124,9 @@ async function callDeepSeek(messages: { role: string; content: string }[]) {
     body: JSON.stringify({
       model: "deepseek-chat",
       messages,
-      temperature: 0.9,
+      temperature: 1.15,
+      presence_penalty: 0.7,
+      frequency_penalty: 0.45,
       max_tokens: 600,
     }),
   });
@@ -164,7 +205,7 @@ export async function POST(req: Request) {
     // ── 1. Generate Questions ──
     if (action === "questions") {
       const fallback = fallbackQuestions[stage] ?? fallbackQuestions["in_love"];
-      const questions = fallback[language === "ru" ? "ru" : "en"];
+      const questions = randomThree(fallback[language === "ru" ? "ru" : "en"]);
 
       if (!DEEPSEEK_API_KEY || DEEPSEEK_API_KEY === "your_deepseek_api_key_here") {
         return NextResponse.json({ questions });
@@ -178,13 +219,14 @@ export async function POST(req: Request) {
         deep: { ru: "глубокий и кинематографичный", en: "deep and cinematic" },
       };
       const toneLabel = toneLabelMap[tone]?.[language === "ru" ? "ru" : "en"] ?? toneLabelMap.tender[language === "ru" ? "ru" : "en"];
+      const freshSeed = crypto.randomBytes(8).toString("hex");
 
       const systemPrompt =
         language === "ru"
           ? `Ты — поэтичный, чуткий помощник для пар. Генерируй 3 коротких, глубоких, эмоциональных вопроса для пары на этапе "${stageLabel}". 
-Тон вопросов: ${toneLabel}. ${profileContext} Вопросы должны быть личными, кинематографичными, без клише. Без нумерации. Выведи только 3 вопроса, каждый на отдельной строке.`
+Тон вопросов: ${toneLabel}. ${profileContext} Вопросы должны быть личными, кинематографичными, без клише. Не повторяй банальные формулировки и не повторяй вопросы из прошлых раундов. Сид свежести: ${freshSeed}. Без нумерации. Выведи только 3 вопроса, каждый на отдельной строке.`
           : `You are a poetic, emotionally-intelligent assistant for couples. Generate 3 short, deep, emotionally resonant questions for a couple in the "${stageLabel}" phase.
-Question tone: ${toneLabel}. ${profileContext} Questions must be personal, cinematic, non-cliché. No numbering. Output only 3 questions, one per line.`;
+Question tone: ${toneLabel}. ${profileContext} Questions must be personal, cinematic, non-cliché. Do not repeat generic phrasing or prior-round questions. Freshness seed: ${freshSeed}. No numbering. Output only 3 questions, one per line.`;
 
       try {
         const raw = await callDeepSeek([{ role: "user", content: systemPrompt }]);

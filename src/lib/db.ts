@@ -13,6 +13,8 @@ export type DbUser = {
   love_language: string | null;
   relationship_note: string | null;
   image: string | null;
+  password_hash: string | null;
+  email_verified: number;
   provider: string;
   provider_id: string;
   created_at: string;
@@ -42,6 +44,8 @@ function createDb() {
       love_language TEXT,
       relationship_note TEXT,
       image TEXT,
+      password_hash TEXT,
+      email_verified INTEGER NOT NULL DEFAULT 0,
       provider TEXT NOT NULL,
       provider_id TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -69,6 +73,14 @@ function createDb() {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS email_verification_codes (
+      email TEXT PRIMARY KEY,
+      code_hash TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
   `);
   const columns = db.prepare("PRAGMA table_info(users)").all() as Array<{ name: string }>;
   const existing = new Set(columns.map((column) => column.name));
@@ -79,6 +91,8 @@ function createDb() {
     ["anniversary", "TEXT"],
     ["love_language", "TEXT"],
     ["relationship_note", "TEXT"],
+    ["password_hash", "TEXT"],
+    ["email_verified", "INTEGER NOT NULL DEFAULT 0"],
   ] as const) {
     if (!existing.has(name)) {
       db.exec(`ALTER TABLE users ADD COLUMN ${name} ${type}`);

@@ -31,8 +31,8 @@ export default function AuthPage() {
           <div className="mt-6 rounded-[24px] bg-white/60 p-4 text-[#6f5136]">
             <LockKeyhole className="mb-2" size={20} />
             {isRu
-              ? "Данные остаются локально в SQLite этого проекта. Пароль не нужен для демо-версии."
-              : "Data stays in this project's local SQLite database. No password is needed for the demo version."}
+              ? "Теперь аккаунт защищен паролем и кодом из письма. Обычный режим всё равно можно начать без регистрации."
+              : "Accounts are now protected by a password and an email code. Normal mode still works without signup."}
           </div>
         </div>
 
