@@ -14,7 +14,7 @@ export function PageShell({
   className?: string;
 }) {
   return (
-    <main className={cn("relative min-h-screen overflow-hidden bg-crumpled-paper px-4 pb-14 pt-28", className)}>
+    <main className={cn("relative min-h-screen overflow-hidden bg-crumpled-paper px-4 pb-12 pt-24", className)}>
       <StickerBackdrop dense={denseStickers} />
       <SiteNav />
       <div className="relative z-10 mx-auto max-w-6xl">{children}</div>
