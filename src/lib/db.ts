@@ -21,7 +21,7 @@ export type DbUser = {
   updated_at: string;
 };
 
-const dbDir = path.join(process.cwd(), "data");
+const dbDir = process.env.VERCEL ? path.join("/tmp", "our-story-data") : path.join(process.cwd(), "data");
 const dbPath = path.join(dbDir, "after-us.sqlite");
 
 type GlobalWithDb = typeof globalThis & {
