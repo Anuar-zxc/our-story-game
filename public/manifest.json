@@ -1,0 +1,24 @@
+{
+  "name": "Our Story: Pixel Hearts",
+  "short_name": "Pixel Hearts",
+  "description": "A branching pixel-art relationship visual novel for mobile.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111524",
+  "theme_color": "#111524",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/stickers/pixel-heart-cutout.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/stickers/pixel-heart-cutout.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -16,6 +16,8 @@
 # next.js
 /.next/
 /out/
+/android/app/src/main/assets/public/
+/ios/App/App/public/
 
 # production
 /build

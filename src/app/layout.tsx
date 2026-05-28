@@ -6,8 +6,14 @@ const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" }
 const caveat = Caveat({ subsets: ["latin", "cyrillic"], variable: "--font-caveat" });
 
 export const metadata: Metadata = {
-  title: "Our Story",
-  description: "An emotional relationship journey game for two",
+  title: "Our Story: Pixel Hearts",
+  description: "A branching pixel-art relationship visual novel for mobile",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "Pixel Hearts",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export default function RootLayout({

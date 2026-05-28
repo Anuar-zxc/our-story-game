@@ -1,95 +1,170 @@
 "use client";
 
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, Eye, Heart, LockKeyhole, Radio, Sparkles } from "lucide-react";
-import { useTranslation, useGameStore } from "@/store/gameStore";
-import { PageShell } from "@/components/PageShell";
+import { useMemo, useState } from "react";
+import {
+  clampStat,
+  getEndingGrade,
+  initialPixelStats,
+  pixelNodes,
+  pixelStatLabels,
+  type PixelChoice,
+  type PixelStat,
+} from "@/lib/pixelStory";
+import { PixelCharacter } from "@/components/PixelCharacter";
+import { useGameStore } from "@/store/gameStore";
+
+type HistoryItem = {
+  choiceText: string;
+};
+
+const statsOrder: PixelStat[] = ["trust", "spark", "truth", "distance", "chaos"];
 
 export default function Home() {
-  const { language } = useTranslation();
-  const { setPhase } = useGameStore();
+  const language = useGameStore((state) => state.language);
+  const setLanguage = useGameStore((state) => state.setLanguage);
   const isRu = language === "ru";
+  const [nodeId, setNodeId] = useState("start");
+  const [stats, setStats] = useState(initialPixelStats);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [flags, setFlags] = useState<string[]>([]);
+  const node = pixelNodes[nodeId];
+  const endingGrade = useMemo(() => getEndingGrade(stats), [stats]);
 
-  const steps = isRu
-    ? [
-        { title: "Выберите сценарий", text: "На расстоянии, после ссоры, идеальные отношения или другой этап.", icon: Heart },
-        { title: "Ответьте отдельно", text: "Каждый пишет свои ответы. В режиме на расстоянии ответы скрыты до конца.", icon: LockKeyhole },
-        { title: "Откройте reveal", text: "AI покажет совпадения, различия, скрытую тему и задание на сегодня.", icon: Eye },
-      ]
-    : [
-        { title: "Choose a scenario", text: "Long-distance, after a fight, perfect relationship, or another stage.", icon: Heart },
-        { title: "Answer separately", text: "Each person writes alone. In distance mode, answers stay hidden until the end.", icon: LockKeyhole },
-        { title: "Open the reveal", text: "AI shows matches, differences, the hidden theme, and a task for today.", icon: Eye },
-      ];
+  const choose = (choice: PixelChoice) => {
+    const nextStats = { ...stats };
+    for (const [key, value] of Object.entries(choice.delta) as Array<[PixelStat, number]>) {
+      nextStats[key] = clampStat(nextStats[key] + value);
+    }
+    setStats(nextStats);
+    setHistory((items) => [
+      ...items,
+      {
+        choiceText: isRu ? choice.textRu : choice.textEn,
+      },
+    ]);
+    if (choice.flag) setFlags((items) => [...items, choice.flag as string]);
+    setNodeId(choice.next);
+  };
+
+  const restart = () => {
+    setNodeId("start");
+    setStats(initialPixelStats);
+    setHistory([]);
+    setFlags([]);
+  };
 
   return (
-    <PageShell denseStickers className="flex items-center">
-      <section className="mx-auto grid min-h-[calc(100vh-7.5rem)] w-full max-w-5xl items-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="relative overflow-hidden rounded-[34px] border border-white/55 bg-[#fff8e8]/88 p-5 shadow-[0_24px_70px_rgba(80,45,0,0.18)] backdrop-blur-xl md:p-8 lg:p-10"
-        >
-          <div className="absolute right-5 top-5 hidden rotate-6 rounded-[22px] border border-white/70 bg-white/55 px-4 py-3 shadow-sm md:block">
-            <div className="flex items-center gap-2 text-[#8b5043]">
-              <Sparkles size={18} />
-              <span className="text-xs font-bold uppercase tracking-[0.18em]">DeepSeek reveal</span>
+    <main className={`pixel-game pixel-mood-${node.mood}`}>
+      <div className="pixel-scanlines" />
+      <div className="pixel-stars" />
+
+      <section className="pixel-shell">
+        <header className="pixel-topbar">
+          <div>
+            <p className="pixel-kicker">{isRu ? "мобильная visual novel" : "mobile visual novel"}</p>
+            <h1>Our Story: Pixel Hearts</h1>
+          </div>
+          <button
+            className="pixel-lang"
+            type="button"
+            onClick={() => setLanguage(isRu ? "en" : "ru")}
+            aria-label={isRu ? "Switch to English" : "Переключить на русский"}
+          >
+            {isRu ? "RU" : "EN"}
+          </button>
+        </header>
+
+        <div className="pixel-stage">
+          <div className="pixel-scene-card">
+            <div className="pixel-scene-top">
+              <span>{node.act}</span>
+              <span>{isRu ? node.sceneRu : node.sceneEn}</span>
+            </div>
+            <PixelCharacter mood={node.mood} />
+            <div className="pixel-ground">
+              <span />
+              <span />
+              <span />
             </div>
           </div>
 
-          <div className="max-w-3xl">
-            <p className="mb-4 inline-flex rounded-full border border-[#c9605a]/20 bg-white/60 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#9b554b]">
-              {isRu ? "AI-игра для пары" : "AI game for two"}
-            </p>
-            <h1 className="font-serif text-[clamp(3.35rem,7vw,6.6rem)] font-bold leading-[0.9] text-[#2c2010]">
-              {isRu ? "Наша история" : "Our Story"}
-            </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-[#5e412b] md:text-xl">
-              {isRu
-                ? "Игра, где вы отвечаете отдельно, а потом узнаете, что у вас совпало, где вы разные и что стоит сделать друг для друга сегодня."
-                : "A game where you answer separately, then discover what matched, where you differ, and what to do for each other today."}
-            </p>
-          </div>
-
-          <div className="mt-7 grid gap-3 md:grid-cols-3">
-            {steps.map(({ title, text, icon: Icon }, index) => (
-              <div key={title} className="rounded-[22px] border border-white/65 bg-white/64 p-4 shadow-sm backdrop-blur-md">
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-[#f3d8cc] text-[#8b5043]">
-                    <Icon size={18} />
+          <aside className="pixel-side-panel">
+            <p className="pixel-panel-title">{isRu ? "состояние связи" : "bond state"}</p>
+            <div className="pixel-stat-grid">
+              {statsOrder.map((key) => (
+                <div key={key} className="pixel-stat">
+                  <div className="pixel-stat-row">
+                    <span>{isRu ? pixelStatLabels[key].ru : pixelStatLabels[key].en}</span>
+                    <b>{stats[key]}</b>
                   </div>
-                  <span className="font-serif text-2xl font-bold text-[#c9605a]">{index + 1}</span>
+                  <div className="pixel-stat-track">
+                    <span style={{ width: `${stats[key]}%` }} />
+                  </div>
                 </div>
-                <h2 className="font-serif text-xl font-bold leading-tight text-[#2c2010]">{title}</h2>
-                <p className="mt-2 text-sm leading-6 text-[#6f5136]">{text}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            <div className="pixel-grade">
+              <span>{isRu ? "прогноз концовки" : "ending forecast"}</span>
+              <b>{endingGrade}</b>
+            </div>
+          </aside>
+        </div>
 
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link
-              href="/setup"
-              onClick={() => setPhase("setup")}
-              className="group inline-flex items-center gap-3 rounded-full bg-[#2c2010] px-6 py-3.5 text-base font-bold text-white shadow-[0_18px_45px_rgba(44,32,16,0.24)] transition hover:-translate-y-1"
-            >
-              {isRu ? "Начать игру" : "Start game"}
-              <ArrowRight className="transition group-hover:translate-x-1" size={20} />
-            </Link>
-            <Link
-              href="/distance"
-              className="inline-flex items-center gap-3 rounded-full border-2 border-[#2c2010]/15 bg-white/55 px-6 py-3.5 text-base font-bold text-[#2c2010] transition hover:bg-white"
-            >
-              <Radio size={20} />
-              {isRu ? "Играть на расстоянии" : "Long-distance mode"}
-            </Link>
-            <Link href="/auth" className="text-sm font-bold text-[#8b5043] underline-offset-4 hover:underline">
-              {isRu ? "Сохранить прогресс через email" : "Save progress with email"}
-            </Link>
+        <section className="pixel-dialogue">
+          <div className="pixel-nameplate">{isRu ? node.speakerRu : node.speakerEn}</div>
+          <p>{isRu ? node.lineRu : node.lineEn}</p>
+        </section>
+
+        {node.choices.length > 0 ? (
+          <section className="pixel-choices" aria-label={isRu ? "Выборы" : "Choices"}>
+            {node.choices.map((choice) => (
+              <button key={choice.id} type="button" onClick={() => choose(choice)} className="pixel-choice">
+                <span>{isRu ? choice.textRu : choice.textEn}</span>
+                <i>{formatDelta(choice.delta, isRu)}</i>
+              </button>
+            ))}
+          </section>
+        ) : (
+          <section className="pixel-ending">
+            <div>
+              <p className="pixel-kicker">{isRu ? "результат прохождения" : "run result"}</p>
+              <h2>{isRu ? `Ранг ${endingGrade}` : `Rank ${endingGrade}`}</h2>
+              <p>
+                {isRu
+                  ? `Ты открыл ${history.length} развилок и собрал ${new Set(flags).size} сюжетных флагов.`
+                  : `You opened ${history.length} branches and collected ${new Set(flags).size} story flags.`}
+              </p>
+            </div>
+            <button type="button" onClick={restart} className="pixel-primary">
+              {isRu ? "Начать новый маршрут" : "Start a new route"}
+            </button>
+          </section>
+        )}
+
+        <footer className="pixel-log">
+          <p>{isRu ? "журнал маршрута" : "route log"}</p>
+          <div>
+            {history.length === 0
+              ? isRu
+                ? "Первый выбор еще впереди."
+                : "Your first choice is waiting."
+              : history
+                  .slice(-4)
+                  .map((item, index) => `${index + 1}. ${item.choiceText}`)
+                  .join(" / ")}
           </div>
-        </motion.div>
+        </footer>
       </section>
-    </PageShell>
+    </main>
   );
+}
+
+function formatDelta(delta: Partial<Record<PixelStat, number>>, isRu: boolean) {
+  const items = Object.entries(delta) as Array<[PixelStat, number]>;
+  return items
+    .map(([key, value]) => {
+      const label = isRu ? pixelStatLabels[key].ru : pixelStatLabels[key].en;
+      return `${value > 0 ? "+" : ""}${value} ${label}`;
+    })
+    .join("  ");
 }

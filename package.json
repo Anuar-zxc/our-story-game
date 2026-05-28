@@ -6,9 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mobile:add:android": "cap add android",
+    "mobile:add:ios": "cap add ios",
+    "mobile:sync": "cap sync",
+    "mobile:open:android": "cap open android",
+    "mobile:open:ios": "cap open ios"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.4",
+    "@capacitor/cli": "^8.3.4",
+    "@capacitor/core": "^8.3.4",
+    "@capacitor/ios": "^8.3.4",
     "better-sqlite3": "^12.10.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
