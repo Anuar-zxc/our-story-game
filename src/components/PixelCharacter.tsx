@@ -2,11 +2,13 @@
 
 type PixelCharacterProps = {
   mood?: "soft" | "glitch" | "night" | "warm" | "danger";
+  expression?: "neutral" | "soft" | "hurt" | "smile" | "shock";
+  side?: "hero" | "player";
 };
 
-export function PixelCharacter({ mood = "soft" }: PixelCharacterProps) {
+export function PixelCharacter({ mood = "soft", expression = "neutral", side = "hero" }: PixelCharacterProps) {
   return (
-    <div className={`pixel-character pixel-character-${mood}`} aria-hidden="true">
+    <div className={`pixel-character pixel-character-${mood} pixel-expression-${expression} pixel-character-${side}`} aria-hidden="true">
       <div className="pixel-shadow" />
       <div className="pixel-hair pixel-hair-back" />
       <div className="pixel-head">
@@ -26,6 +28,7 @@ export function PixelCharacter({ mood = "soft" }: PixelCharacterProps) {
       <div className="pixel-arm pixel-arm-right" />
       <div className="pixel-leg pixel-leg-left" />
       <div className="pixel-leg pixel-leg-right" />
+      <div className="pixel-ribbon" />
       <div className="pixel-sparkle pixel-sparkle-a" />
       <div className="pixel-sparkle pixel-sparkle-b" />
     </div>
