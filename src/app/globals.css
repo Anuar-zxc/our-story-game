@@ -1187,3 +1187,762 @@
     align-content: space-between;
   }
 }
+
+/* Dark visual novel */
+.bunny-novel {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  color: #edf3ff;
+  background:
+    linear-gradient(180deg, rgba(5, 8, 15, 0.1), rgba(5, 8, 15, 0.94)),
+    radial-gradient(circle at 52% 24%, rgba(84, 123, 161, 0.32), transparent 38%),
+    #06080f;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.bunny-novel::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.72), transparent 20%, transparent 80%, rgba(0, 0, 0, 0.72)),
+    linear-gradient(180deg, rgba(3, 5, 12, 0.12), rgba(3, 5, 12, 0.82));
+  z-index: 10;
+}
+
+.bunny-noise,
+.bunny-snow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bunny-noise {
+  z-index: 45;
+  opacity: 0.13;
+  mix-blend-mode: screen;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 4px),
+    repeating-radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.3) 0 1px, transparent 1px 7px);
+}
+
+.bunny-snow {
+  z-index: 12;
+  opacity: 0.58;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.54) 0 1px, transparent 2px);
+  background-size: 120px 120px, 190px 190px;
+  animation: bunny-snow 16s linear infinite;
+}
+
+.bunny-cut::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: #05060b;
+  animation: bunny-cut 0.32s ease both;
+}
+
+.bunny-top {
+  position: fixed;
+  z-index: 35;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  right: max(14px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  background: rgba(7, 10, 17, 0.72);
+  border: 1px solid rgba(215, 226, 244, 0.16);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(18px);
+}
+
+.bunny-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.bunny-brand > span {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, transparent 44%, #b91d37 45% 55%, transparent 56%),
+    linear-gradient(45deg, transparent 44%, #b91d37 45% 55%, transparent 56%),
+    #f1f5ff;
+  box-shadow: inset 0 0 0 2px rgba(4, 6, 11, 0.72), 0 0 28px rgba(185, 29, 55, 0.25);
+}
+
+.bunny-brand p,
+.bunny-meta,
+.bunny-ending p,
+.bunny-diary-head p,
+.bunny-log p {
+  margin: 0;
+  color: #9fb0c4;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.bunny-brand h1 {
+  margin: 1px 0 0;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1.05;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.bunny-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.bunny-actions button,
+.bunny-ending button,
+.bunny-diary-head button {
+  appearance: none;
+  border: 1px solid rgba(229, 238, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(238, 244, 255, 0.08);
+  color: #edf3ff;
+  min-height: 42px;
+  padding: 0 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bunny-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(12, 20, 34, 0.15), rgba(5, 7, 12, 0.2) 48%, rgba(3, 4, 8, 0.86)),
+    linear-gradient(135deg, #1c2c42 0%, #101827 48%, #06080f 100%);
+}
+
+.bunny-tone-calm .bunny-stage {
+  filter: saturate(0.9) brightness(1.04);
+}
+
+.bunny-tone-panic .bunny-stage,
+.bunny-tone-nightmare .bunny-stage {
+  filter: saturate(0.75) contrast(1.22);
+}
+
+.bunny-moon {
+  position: absolute;
+  top: 10%;
+  right: 17%;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: #dce7f8;
+  box-shadow: 0 0 70px rgba(198, 221, 255, 0.45);
+  opacity: 0.78;
+}
+
+.bunny-forest-line {
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  bottom: 18%;
+  height: 58%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  opacity: 0.86;
+}
+
+.bunny-forest-line span {
+  --height: calc(230px + (var(--i) * 13px));
+  width: 0;
+  height: 0;
+  border-left: 45px solid transparent;
+  border-right: 45px solid transparent;
+  border-bottom: var(--height) solid rgba(3, 8, 14, 0.95);
+  filter: drop-shadow(0 0 20px rgba(6, 10, 18, 0.6));
+}
+
+.bunny-houses {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 22%;
+  display: none;
+  justify-content: space-between;
+}
+
+.bunny-houses span {
+  width: 180px;
+  height: 110px;
+  background: #0d111c;
+  border-top: 44px solid #171f31;
+  box-shadow: inset 32px 36px 0 rgba(241, 197, 96, 0.28);
+}
+
+.bunny-road {
+  position: absolute;
+  left: 50%;
+  bottom: -18%;
+  width: 42%;
+  height: 70%;
+  transform: translateX(-50%) perspective(380px) rotateX(62deg);
+  background: linear-gradient(90deg, transparent, rgba(214, 226, 242, 0.22), transparent);
+  border-left: 2px solid rgba(238, 245, 255, 0.14);
+  border-right: 2px solid rgba(238, 245, 255, 0.14);
+  opacity: 0.75;
+}
+
+.bunny-lake-surface,
+.bunny-window,
+.bunny-bus-stop,
+.bunny-school,
+.bunny-dream-eyes {
+  display: none;
+}
+
+.bunny-novel.bunny-lake .bunny-lake-surface {
+  display: block;
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 8%;
+  height: 28%;
+  border-radius: 50% 50% 0 0;
+  background:
+    repeating-linear-gradient(170deg, rgba(255, 255, 255, 0.12) 0 2px, transparent 2px 28px),
+    linear-gradient(180deg, rgba(157, 190, 220, 0.2), rgba(4, 7, 12, 0.58));
+  box-shadow: inset 0 22px 80px rgba(213, 230, 255, 0.18);
+}
+
+.bunny-novel.bunny-room .bunny-window {
+  display: block;
+  position: absolute;
+  right: 18%;
+  top: 20%;
+  width: 220px;
+  height: 310px;
+  border: 12px solid rgba(230, 235, 244, 0.12);
+  background:
+    linear-gradient(90deg, transparent 47%, rgba(230, 235, 244, 0.2) 48% 52%, transparent 53%),
+    linear-gradient(180deg, transparent 47%, rgba(230, 235, 244, 0.2) 48% 52%, transparent 53%),
+    rgba(5, 8, 15, 0.55);
+  box-shadow: 0 0 120px rgba(139, 180, 224, 0.16);
+}
+
+.bunny-novel.bunny-bus .bunny-bus-stop {
+  display: block;
+  position: absolute;
+  right: 17%;
+  bottom: 22%;
+  width: 250px;
+  height: 190px;
+  border-left: 10px solid #121825;
+  border-right: 10px solid #121825;
+  border-top: 18px solid #121825;
+  background: linear-gradient(180deg, rgba(203, 219, 240, 0.08), rgba(5, 7, 12, 0.58));
+}
+
+.bunny-novel.bunny-school .bunny-school {
+  display: block;
+  position: absolute;
+  inset: 18% 8% 18%;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 110px, rgba(255, 255, 255, 0.07) 110px 112px),
+    linear-gradient(180deg, rgba(63, 75, 92, 0.7), rgba(10, 13, 20, 0.72));
+  border-top: 16px solid rgba(229, 235, 245, 0.16);
+  opacity: 0.82;
+}
+
+.bunny-novel.bunny-dream .bunny-dream-eyes {
+  position: absolute;
+  inset: 14% 12% 22%;
+  display: block;
+}
+
+.bunny-dream-eyes span {
+  position: absolute;
+  width: 90px;
+  height: 24px;
+  border-radius: 50%;
+  background: #d9eefc;
+  box-shadow: 0 0 34px rgba(217, 238, 252, 0.42);
+  opacity: 0.62;
+}
+
+.bunny-dream-eyes span:nth-child(1) { left: 8%; top: 30%; }
+.bunny-dream-eyes span:nth-child(2) { right: 12%; top: 18%; transform: scale(0.7); }
+.bunny-dream-eyes span:nth-child(3) { left: 48%; bottom: 12%; transform: scale(0.55); }
+
+.bunny-portrait {
+  --hair: #9bb1c8;
+  --skin: #e5c8b5;
+  --cloth: #161d34;
+  position: absolute;
+  z-index: 18;
+  left: 50%;
+  bottom: 13%;
+  width: 250px;
+  height: 540px;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 42px 70px rgba(0, 0, 0, 0.72));
+  animation: bunny-idle 4.6s ease-in-out infinite;
+}
+
+.bunny-portrait-anton {
+  --hair: #2b303c;
+  --skin: #d8b8a2;
+  --cloth: #253049;
+  left: 46%;
+  transform: translateX(-50%) scale(0.92);
+}
+
+.bunny-portrait-stranger {
+  --hair: #2f3034;
+  --skin: #b7a391;
+  --cloth: #141923;
+  left: 57%;
+  transform: translateX(-50%) scale(1.04);
+  opacity: 0.9;
+}
+
+.bunny-portrait-mira_shadow {
+  --hair: #8aa9c7;
+  --skin: #d7c1bc;
+  --cloth: #111729;
+  opacity: 0.86;
+}
+
+.bunny-portrait-mira_shadow::after {
+  content: "";
+  position: absolute;
+  inset: -10% -20%;
+  background: radial-gradient(circle at 50% 38%, transparent 0 36%, rgba(0, 0, 0, 0.4) 37% 68%, transparent 69%);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.bunny-hair {
+  position: absolute;
+  left: 44px;
+  top: 20px;
+  width: 164px;
+  height: 190px;
+  border-radius: 50% 50% 42% 42%;
+  background: var(--hair);
+  box-shadow:
+    -55px 75px 0 -20px var(--hair),
+    55px 80px 0 -21px var(--hair),
+    inset -25px 0 0 rgba(12, 20, 33, 0.22);
+}
+
+.bunny-face {
+  position: absolute;
+  left: 67px;
+  top: 86px;
+  width: 118px;
+  height: 118px;
+  border-radius: 45% 45% 50% 50%;
+  background: var(--skin);
+  box-shadow: inset -16px -4px 0 rgba(118, 69, 68, 0.12);
+}
+
+.bunny-eye {
+  position: absolute;
+  top: 42px;
+  width: 19px;
+  height: 25px;
+  border-radius: 50%;
+  background: #10131a;
+  box-shadow: inset 5px 4px 0 #f2f7ff;
+}
+
+.bunny-eye-left { left: 28px; }
+.bunny-eye-right { right: 28px; }
+
+.bunny-mouth {
+  position: absolute;
+  left: 53px;
+  top: 80px;
+  width: 18px;
+  height: 7px;
+  border-radius: 0 0 12px 12px;
+  background: #7c2b35;
+}
+
+.bunny-body {
+  position: absolute;
+  left: 54px;
+  top: 198px;
+  width: 142px;
+  height: 220px;
+  border-radius: 38px 38px 22px 22px;
+  background:
+    linear-gradient(90deg, transparent 36%, rgba(246, 247, 250, 0.95) 37% 63%, transparent 64%),
+    var(--cloth);
+  box-shadow:
+    -46px 64px 0 -17px var(--skin),
+    46px 64px 0 -17px var(--skin),
+    -28px 223px 0 -4px var(--cloth),
+    28px 223px 0 -4px var(--cloth);
+}
+
+.bunny-ribbon {
+  position: absolute;
+  right: 46px;
+  top: 52px;
+  width: 38px;
+  height: 18px;
+  border-radius: 16px 4px 16px 4px;
+  background: #b91d37;
+  transform: rotate(18deg);
+  box-shadow: 21px 2px 0 #9f1830, 0 0 24px rgba(185, 29, 55, 0.45);
+}
+
+.bunny-progress {
+  position: fixed;
+  z-index: 33;
+  left: 18px;
+  right: 18px;
+  top: calc(max(12px, env(safe-area-inset-top)) + 73px);
+  height: 3px;
+  background: rgba(233, 241, 255, 0.11);
+}
+
+.bunny-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #e4eefc, #b91d37);
+  transition: width 0.24s ease;
+}
+
+.bunny-dialogue {
+  position: fixed;
+  z-index: 34;
+  left: max(18px, env(safe-area-inset-left));
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  min-height: 170px;
+  padding: 18px 22px 20px;
+  background: rgba(5, 8, 15, 0.86);
+  border: 1px solid rgba(230, 239, 255, 0.24);
+  box-shadow: 0 -16px 70px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+}
+
+.bunny-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.bunny-dialogue h2 {
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1.1;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.bunny-dialogue p {
+  margin: 0;
+  max-width: 960px;
+  color: #dce7f7;
+  font-size: 18px;
+  line-height: 1.62;
+}
+
+.bunny-choices {
+  position: fixed;
+  z-index: 36;
+  left: 18px;
+  right: 18px;
+  bottom: calc(210px + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.bunny-choices button {
+  appearance: none;
+  min-height: 86px;
+  padding: 14px 16px;
+  border: 1px solid rgba(224, 235, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(7, 10, 18, 0.74);
+  color: #f4f8ff;
+  text-align: left;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(14px);
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.bunny-choices button:hover {
+  transform: translateY(-4px);
+  border-color: rgba(246, 248, 255, 0.5);
+  background: rgba(17, 23, 36, 0.86);
+}
+
+.bunny-choices span {
+  display: block;
+  font-size: 15px;
+  font-weight: 850;
+  line-height: 1.32;
+}
+
+.bunny-choices i {
+  display: block;
+  margin-top: 10px;
+  color: #aebdd1;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.35;
+}
+
+.bunny-ending {
+  position: fixed;
+  z-index: 36;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: calc(215px + env(safe-area-inset-bottom));
+  width: min(440px, calc(100vw - 36px));
+  padding: 22px;
+  background: rgba(7, 10, 18, 0.82);
+  border: 1px solid rgba(224, 235, 255, 0.24);
+  box-shadow: 0 22px 64px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
+}
+
+.bunny-ending h2 {
+  margin: 8px 0 16px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 32px;
+}
+
+.bunny-diary {
+  position: fixed;
+  z-index: 55;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  width: min(380px, calc(100vw - 28px));
+  padding: 18px;
+  transform: translateX(calc(100% + 24px));
+  transition: transform 0.26s ease;
+  overflow: auto;
+  background: rgba(5, 8, 15, 0.92);
+  border: 1px solid rgba(224, 235, 255, 0.2);
+  box-shadow: -24px 0 80px rgba(0, 0, 0, 0.54);
+  backdrop-filter: blur(20px);
+}
+
+.bunny-diary.open {
+  transform: translateX(0);
+}
+
+.bunny-diary-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.bunny-diary-head h2 {
+  margin: 6px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+}
+
+.bunny-stat-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.bunny-stat div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: #dce7f7;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.bunny-stat i {
+  display: block;
+  height: 9px;
+  margin-top: 8px;
+  overflow: hidden;
+  background: rgba(241, 247, 255, 0.1);
+}
+
+.bunny-stat i span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #d9e6f8, #b91d37);
+}
+
+.bunny-log,
+.bunny-flags {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.bunny-log span,
+.bunny-flags span {
+  color: #bdcadb;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.bunny-flags {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bunny-flags span {
+  padding: 8px 10px;
+  border: 1px solid rgba(224, 235, 255, 0.13);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes bunny-snow {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 80px 220px, -60px 300px; }
+}
+
+@keyframes bunny-idle {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+@keyframes bunny-cut {
+  0% { opacity: 0; }
+  45% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (max-width: 860px) {
+  .bunny-top {
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .bunny-brand > span {
+    width: 36px;
+    height: 36px;
+  }
+
+  .bunny-brand p {
+    font-size: 9px;
+  }
+
+  .bunny-brand h1 {
+    font-size: 18px;
+  }
+
+  .bunny-actions {
+    gap: 6px;
+  }
+
+  .bunny-actions button {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .bunny-portrait {
+    width: 190px;
+    height: 410px;
+    bottom: 24%;
+    transform: translateX(-50%) scale(0.78);
+  }
+
+  .bunny-portrait-anton {
+    left: 43%;
+    transform: translateX(-50%) scale(0.72);
+  }
+
+  .bunny-portrait-stranger {
+    left: 56%;
+    transform: translateX(-50%) scale(0.8);
+  }
+
+  .bunny-moon {
+    width: 78px;
+    height: 78px;
+    right: 13%;
+    top: 15%;
+  }
+
+  .bunny-forest-line {
+    bottom: 26%;
+  }
+
+  .bunny-forest-line span {
+    border-left-width: 34px;
+    border-right-width: 34px;
+  }
+
+  .bunny-dialogue {
+    min-height: 190px;
+    padding: 15px 16px 17px;
+  }
+
+  .bunny-dialogue h2 {
+    font-size: 21px;
+  }
+
+  .bunny-dialogue p {
+    font-size: 15px;
+    line-height: 1.52;
+  }
+
+  .bunny-meta {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .bunny-choices {
+    grid-template-columns: 1fr;
+    bottom: calc(225px + env(safe-area-inset-bottom));
+    gap: 8px;
+  }
+
+  .bunny-choices button {
+    min-height: 58px;
+    padding: 11px 13px;
+  }
+
+  .bunny-choices span {
+    font-size: 14px;
+  }
+
+  .bunny-choices i {
+    margin-top: 5px;
+    font-size: 11px;
+  }
+
+  .bunny-ending {
+    left: 18px;
+    right: 18px;
+    bottom: calc(220px + env(safe-area-inset-bottom));
+    width: auto;
+  }
+}

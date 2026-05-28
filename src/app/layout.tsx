@@ -6,12 +6,12 @@ const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" }
 const caveat = Caveat({ subsets: ["latin", "cyrillic"], variable: "--font-caveat" });
 
 export const metadata: Metadata = {
-  title: "Our Story: Pixel Hearts",
-  description: "A branching pixel-art relationship visual novel for mobile",
+  title: "Black Snow",
+  description: "A dark branching visual novel about a winter settlement, a forest, and choices that remember you.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    title: "Pixel Hearts",
+    title: "Black Snow",
     statusBarStyle: "black-translucent",
   },
 };
@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <body className={`${inter.variable} ${caveat.variable} font-sans antialiased text-stone-800 bg-paper-texture`}>
         {children}
       </body>

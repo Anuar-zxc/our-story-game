@@ -1,7 +1,7 @@
 {
-  "name": "Our Story: Pixel Hearts",
-  "short_name": "Pixel Hearts",
-  "description": "A branching pixel-art relationship visual novel for mobile.",
+  "name": "Black Snow",
+  "short_name": "Black Snow",
+  "description": "A dark branching visual novel about a winter settlement, a forest, and choices that remember you.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#111524",

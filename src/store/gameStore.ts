@@ -60,7 +60,7 @@ export interface GameState {
 }
 
 const initialState = {
-  language: 'en' as Language,
+  language: 'ru' as Language,
   phase: 'landing' as GamePhase,
   player1Name: '',
   player2Name: '',

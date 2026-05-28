@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.ourstory.pixelhearts",
-  appName: "Pixel Hearts",
+  appId: "com.ourstory.blacksnow",
+  appName: "Black Snow",
   webDir: ".next",
   server: {
     url: "https://our-story-game.vercel.app",

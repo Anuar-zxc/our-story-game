@@ -2,269 +2,238 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  clampStat,
-  getEndingGrade,
-  initialPixelStats,
-  pixelNodes,
-  pixelStatLabels,
-  type PixelChoice,
-  type PixelStat,
-} from "@/lib/pixelStory";
-import { PixelCharacter } from "@/components/PixelCharacter";
-import { useGameStore } from "@/store/gameStore";
+  clampNovelStat,
+  getNovelEnding,
+  novelInitialStats,
+  novelScenes,
+  novelStatLabels,
+  type NovelChoice,
+  type NovelStat,
+} from "@/lib/darkNovel";
 import { playPixelTone, startPixelAmbience, stopPixelAmbience } from "@/lib/pixelAudio";
+import { useGameStore } from "@/store/gameStore";
 
-type HistoryItem = {
-  choiceText: string;
-  scene: string;
+type LogItem = {
+  place: string;
+  choice: string;
 };
 
-const statsOrder: PixelStat[] = ["trust", "spark", "truth", "distance", "chaos"];
-const maxBranches = 6;
+const statOrder: NovelStat[] = ["bravery", "doubt", "tenderness", "obsession"];
 
 export default function Home() {
   const language = useGameStore((state) => state.language);
   const setLanguage = useGameStore((state) => state.setLanguage);
   const isRu = language === "ru";
-  const [nodeId, setNodeId] = useState("start");
-  const [stats, setStats] = useState(initialPixelStats);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [sceneId, setSceneId] = useState("start");
+  const [stats, setStats] = useState(novelInitialStats);
   const [flags, setFlags] = useState<string[]>([]);
+  const [log, setLog] = useState<LogItem[]>([]);
   const [soundOn, setSoundOn] = useState(false);
-  const [flash, setFlash] = useState(false);
-  const node = pixelNodes[nodeId];
-  const endingGrade = useMemo(() => getEndingGrade(stats), [stats]);
-  const sceneKind = getSceneKind(nodeId);
-  const expression = getExpression(nodeId, node.mood);
-  const progress = Math.min(100, Math.round((history.length / maxBranches) * 100));
+  const [showDiary, setShowDiary] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const scene = novelScenes[sceneId];
+  const route = useMemo(() => getNovelEnding(stats), [stats]);
+  const progress = Math.min(100, Math.round(((log.length + 1) / 8) * 100));
 
   useEffect(() => {
     if (!soundOn) {
       stopPixelAmbience();
       return;
     }
-    startPixelAmbience(node.mood);
-    return () => stopPixelAmbience();
-  }, [node.mood, soundOn]);
 
-  const choose = (choice: PixelChoice) => {
-    playPixelTone(choice.next.includes("bad") ? "bad" : choice.next.includes("ending") ? "ending" : "choice");
+    startPixelAmbience(scene.tone);
+    return () => stopPixelAmbience();
+  }, [scene.tone, soundOn]);
+
+  const choose = (choice: NovelChoice) => {
+    if (transitioning) return;
+    playPixelTone(choice.next.includes("ending") ? "ending" : scene.tone === "nightmare" ? "bad" : "choice");
+
     const nextStats = { ...stats };
-    for (const [key, value] of Object.entries(choice.delta) as Array<[PixelStat, number]>) {
-      nextStats[key] = clampStat(nextStats[key] + value);
+    for (const [key, value] of Object.entries(choice.delta) as Array<[NovelStat, number]>) {
+      nextStats[key] = clampNovelStat(nextStats[key] + value);
     }
+
     setStats(nextStats);
-    setHistory((items) => [
+    setLog((items) => [
       ...items,
       {
-        choiceText: isRu ? choice.textRu : choice.textEn,
-        scene: isRu ? node.sceneRu : node.sceneEn,
+        place: isRu ? scene.placeRu : scene.placeEn,
+        choice: isRu ? choice.ru : choice.en,
       },
     ]);
     if (choice.flag) setFlags((items) => [...items, choice.flag as string]);
-    setFlash(true);
-    setNodeId(choice.next);
-    window.setTimeout(() => setFlash(false), 360);
+    setTransitioning(true);
+    window.setTimeout(() => {
+      setSceneId(choice.next);
+      setTransitioning(false);
+    }, 260);
   };
 
   const restart = () => {
     playPixelTone("confirm");
-    setNodeId("start");
-    setStats(initialPixelStats);
-    setHistory([]);
+    setSceneId("start");
+    setStats(novelInitialStats);
     setFlags([]);
+    setLog([]);
+    setTransitioning(false);
   };
 
   return (
-    <main className={`pixel-game pixel-mood-${node.mood} ${flash ? "pixel-flash" : ""}`}>
-      <div className="pixel-scanlines" />
-      <div className="pixel-stars" />
+    <main
+      className={`bunny-novel bunny-${scene.backdrop} bunny-tone-${scene.tone} ${
+        transitioning ? "bunny-cut" : ""
+      }`}
+    >
+      <div className="bunny-noise" />
+      <div className="bunny-snow" />
 
-      <section className="pixel-shell">
-        <header className="pixel-topbar">
+      <header className="bunny-top">
+        <div className="bunny-brand">
+          <span />
           <div>
-            <p className="pixel-kicker">{isRu ? "мобильная visual novel" : "mobile visual novel"}</p>
-            <h1>Our Story: Pixel Hearts</h1>
+            <p>{isRu ? "темная визуальная новелла" : "dark visual novel"}</p>
+            <h1>{isRu ? "Черный снег" : "Black Snow"}</h1>
           </div>
-          <div className="pixel-top-actions">
-            <button
-              className="pixel-lang"
-              type="button"
-              onClick={() => {
-                playPixelTone("confirm");
-                setSoundOn((value) => !value);
-              }}
-              aria-label={isRu ? "Звук" : "Sound"}
-            >
-              {soundOn ? "SFX" : "OFF"}
-            </button>
-            <button
-              className="pixel-lang"
-              type="button"
-              onClick={() => setLanguage(isRu ? "en" : "ru")}
-              aria-label={isRu ? "Switch to English" : "Переключить на русский"}
-            >
-              {isRu ? "RU" : "EN"}
-            </button>
-          </div>
-        </header>
+        </div>
+        <div className="bunny-actions">
+          <button
+            type="button"
+            onClick={() => {
+              playPixelTone("confirm");
+              setSoundOn((value) => !value);
+            }}
+          >
+            {soundOn ? "SFX" : "OFF"}
+          </button>
+          <button type="button" onClick={() => setLanguage(isRu ? "en" : "ru")}>
+            {isRu ? "RU" : "EN"}
+          </button>
+          <button type="button" onClick={() => setShowDiary((value) => !value)}>
+            {isRu ? "Дневник" : "Diary"}
+          </button>
+        </div>
+      </header>
 
-        <div className="pixel-progress-shell">
-          <span style={{ width: `${progress}%` }} />
-          <b>{isRu ? `Глава ${Math.min(history.length + 1, maxBranches)}/${maxBranches}` : `Chapter ${Math.min(history.length + 1, maxBranches)}/${maxBranches}`}</b>
+      <section className="bunny-stage" aria-label={isRu ? "Сцена" : "Scene"}>
+        <div className="bunny-moon" />
+        <div className="bunny-forest-line">
+          {Array.from({ length: 18 }, (_, index) => (
+            <span key={index} style={{ "--i": index } as React.CSSProperties} />
+          ))}
+        </div>
+        <div className="bunny-houses">
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="bunny-road" />
+        <div className="bunny-lake-surface" />
+        <div className="bunny-window" />
+        <div className="bunny-bus-stop" />
+        <div className="bunny-school" />
+        <div className="bunny-dream-eyes">
+          <span />
+          <span />
+          <span />
         </div>
 
-        <div className="pixel-stage">
-          <div className={`pixel-scene-card pixel-scene-${sceneKind}`}>
-            <div className="pixel-scene-top">
-              <span>{node.act}</span>
-              <span>{isRu ? node.sceneRu : node.sceneEn}</span>
+        {scene.portrait !== "none" ? (
+          <div className={`bunny-portrait bunny-portrait-${scene.portrait}`}>
+            <div className="bunny-hair" />
+            <div className="bunny-face">
+              <span className="bunny-eye bunny-eye-left" />
+              <span className="bunny-eye bunny-eye-right" />
+              <span className="bunny-mouth" />
             </div>
-            <PixelCharacter mood={node.mood} expression={expression} />
-            <PixelCharacter mood={node.mood} expression="neutral" side="player" />
-            <div className="pixel-rain" />
-            <div className="pixel-neon-sign">{getSceneSign(sceneKind)}</div>
-            <div className="pixel-ground">
-              <span />
-              <span />
-              <span />
-            </div>
+            <div className="bunny-body" />
+            <div className="bunny-ribbon" />
           </div>
-
-          <aside className="pixel-side-panel">
-            <p className="pixel-panel-title">{isRu ? "состояние связи" : "bond state"}</p>
-            <div className="pixel-route-card">
-              <span>{isRu ? "маршрут" : "route"}</span>
-              <b>{getRouteName(flags, isRu)}</b>
-            </div>
-            <div className="pixel-stat-grid">
-              {statsOrder.map((key) => (
-                <div key={key} className="pixel-stat">
-                  <div className="pixel-stat-row">
-                    <span>{isRu ? pixelStatLabels[key].ru : pixelStatLabels[key].en}</span>
-                    <b>{stats[key]}</b>
-                  </div>
-                  <div className="pixel-stat-track">
-                    <span style={{ width: `${stats[key]}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="pixel-grade">
-              <span>{isRu ? "прогноз концовки" : "ending forecast"}</span>
-              <b>{endingGrade}</b>
-            </div>
-            <div className="pixel-memory-chips">
-              {flags.slice(-4).map((flag) => (
-                <span key={flag}>{flag.replaceAll("_", " ")}</span>
-              ))}
-            </div>
-          </aside>
-        </div>
-
-        <section key={node.id} className="pixel-dialogue">
-          <div className="pixel-nameplate">{isRu ? node.speakerRu : node.speakerEn}</div>
-          <p>{isRu ? node.lineRu : node.lineEn}</p>
-        </section>
-
-        {node.choices.length > 0 ? (
-          <section className="pixel-choices" aria-label={isRu ? "Выборы" : "Choices"}>
-            {node.choices.map((choice) => (
-              <button
-                key={choice.id}
-                type="button"
-                onPointerUp={() => choose(choice)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") choose(choice);
-                }}
-                className="pixel-choice"
-              >
-                <span>{isRu ? choice.textRu : choice.textEn}</span>
-                <i>{formatDelta(choice.delta, isRu)}</i>
-              </button>
-            ))}
-          </section>
-        ) : (
-          <section className="pixel-ending">
-            <div>
-              <p className="pixel-kicker">{isRu ? "результат прохождения" : "run result"}</p>
-              <h2>{isRu ? `Ранг ${endingGrade}` : `Rank ${endingGrade}`}</h2>
-              <p>
-                {isRu
-                  ? `Ты открыл ${history.length} развилок и собрал ${new Set(flags).size} сюжетных флагов.`
-                  : `You opened ${history.length} branches and collected ${new Set(flags).size} story flags.`}
-              </p>
-            </div>
-            <button type="button" onClick={restart} className="pixel-primary">
-              {isRu ? "Начать новый маршрут" : "Start a new route"}
-            </button>
-          </section>
-        )}
-
-        <footer className="pixel-log">
-          <p>{isRu ? "журнал маршрута" : "route log"}</p>
-          <div>
-            {history.length === 0
-              ? isRu
-                ? "Первый выбор еще впереди."
-                : "Your first choice is waiting."
-              : history
-                  .slice(-4)
-                  .map((item, index) => `${index + 1}. ${item.scene}: ${item.choiceText}`)
-                  .join(" / ")}
-          </div>
-        </footer>
+        ) : null}
       </section>
+
+      <div className="bunny-progress" aria-hidden="true">
+        <span style={{ width: `${progress}%` }} />
+      </div>
+
+      {scene.choices.length > 0 ? (
+        <section className="bunny-choices" aria-label={isRu ? "Выборы" : "Choices"}>
+          {scene.choices.map((choice) => (
+            <button key={choice.id} type="button" onClick={() => choose(choice)}>
+              <span>{isRu ? choice.ru : choice.en}</span>
+              <i>{formatDelta(choice.delta, isRu)}</i>
+            </button>
+          ))}
+        </section>
+      ) : (
+        <section className="bunny-ending">
+          <p>{isRu ? "Маршрут завершен" : "Route complete"}</p>
+          <h2>{route}</h2>
+          <button type="button" onClick={restart}>
+            {isRu ? "Начать заново" : "Restart"}
+          </button>
+        </section>
+      )}
+
+      <section className="bunny-dialogue">
+        <div className="bunny-meta">
+          <span>{scene.chapter}</span>
+          <span>{isRu ? scene.placeRu : scene.placeEn}</span>
+        </div>
+        <h2>{isRu ? scene.speakerRu : scene.speakerEn}</h2>
+        <p>{isRu ? scene.textRu : scene.textEn}</p>
+      </section>
+
+      <aside className={`bunny-diary ${showDiary ? "open" : ""}`}>
+        <div className="bunny-diary-head">
+          <div>
+            <p>{isRu ? "маршрут" : "route"}</p>
+            <h2>{route}</h2>
+          </div>
+          <button type="button" onClick={() => setShowDiary(false)}>
+            {isRu ? "Закрыть" : "Close"}
+          </button>
+        </div>
+        <div className="bunny-stat-list">
+          {statOrder.map((key) => (
+            <div key={key} className="bunny-stat">
+              <div>
+                <span>{isRu ? novelStatLabels[key].ru : novelStatLabels[key].en}</span>
+                <b>{stats[key]}</b>
+              </div>
+              <i>
+                <span style={{ width: `${stats[key]}%` }} />
+              </i>
+            </div>
+          ))}
+        </div>
+        <div className="bunny-log">
+          <p>{isRu ? "последние решения" : "latest decisions"}</p>
+          {log.length === 0 ? (
+            <span>{isRu ? "Дневник пока пуст." : "The diary is empty."}</span>
+          ) : (
+            log.slice(-5).map((item, index) => (
+              <span key={`${item.place}-${item.choice}`}>
+                {index + 1}. {item.place}: {item.choice}
+              </span>
+            ))
+          )}
+        </div>
+        <div className="bunny-flags">
+          {flags.slice(-6).map((flag) => (
+            <span key={flag}>{flag.replaceAll("_", " ")}</span>
+          ))}
+        </div>
+      </aside>
     </main>
   );
 }
 
-function formatDelta(delta: Partial<Record<PixelStat, number>>, isRu: boolean) {
-  const items = Object.entries(delta) as Array<[PixelStat, number]>;
-  return items
+function formatDelta(delta: Partial<Record<NovelStat, number>>, isRu: boolean) {
+  return (Object.entries(delta) as Array<[NovelStat, number]>)
     .map(([key, value]) => {
-      const label = isRu ? pixelStatLabels[key].ru : pixelStatLabels[key].en;
+      const label = isRu ? novelStatLabels[key].ru : novelStatLabels[key].en;
       return `${value > 0 ? "+" : ""}${value} ${label}`;
     })
-    .join("  ");
-}
-
-function getSceneKind(nodeId: string) {
-  if (nodeId.includes("arcade") || nodeId.includes("boss")) return "arcade";
-  if (nodeId.includes("station") || nodeId.includes("train")) return "station";
-  if (nodeId.includes("rain")) return "rain";
-  if (nodeId.includes("market")) return "market";
-  if (nodeId.includes("bridge") || nodeId.includes("ending")) return "bridge";
-  if (nodeId.includes("truth") || nodeId.includes("mirror") || nodeId.includes("bad")) return "glitch";
-  return "roof";
-}
-
-function getSceneSign(sceneKind: string) {
-  const signs: Record<string, string> = {
-    roof: "00:17",
-    arcade: "LOVE.EXE",
-    station: "LAST TRAIN",
-    rain: "VOICE 03",
-    market: "MEMORY SHOP",
-    bridge: "SAVE?",
-    glitch: "ERROR",
-  };
-  return signs[sceneKind] ?? "LOVE.EXE";
-}
-
-function getExpression(nodeId: string, mood: string): "neutral" | "soft" | "hurt" | "smile" | "shock" {
-  if (nodeId.includes("bad") || mood === "danger") return "hurt";
-  if (nodeId.includes("joke") || nodeId.includes("boss") || nodeId.includes("good")) return "smile";
-  if (nodeId.includes("truth") || nodeId.includes("mirror") || mood === "glitch") return "shock";
-  if (nodeId.includes("ending") || nodeId.includes("bridge") || mood === "soft") return "soft";
-  return "neutral";
-}
-
-function getRouteName(flags: string[], isRu: boolean) {
-  if (flags.includes("set_boundary") || flags.includes("mutual_admit")) return isRu ? "честный режим" : "honest mode";
-  if (flags.includes("joke_armor") || flags.includes("stole_memory")) return isRu ? "глитч-маршрут" : "glitch route";
-  if (flags.includes("chose_memory") || flags.includes("new_photo")) return isRu ? "маршрут памяти" : "memory route";
-  if (flags.includes("gentle_home")) return isRu ? "тихий свет" : "quiet light";
-  if (flags.includes("coop_route") || flags.includes("made_her_laugh")) return isRu ? "кооператив" : "co-op";
-  return isRu ? "неизвестная ветка" : "unknown branch";
+    .join(" / ");
 }
